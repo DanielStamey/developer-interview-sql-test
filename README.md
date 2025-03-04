@@ -2,7 +2,7 @@
 
 **These exercises are in PostgreSQL V14, all completed tasks should be compatible with PostgreSQL V14**
 
-## Question 1
+# Question 1
 
 **This needs to return quickly and should not scan the entire table (seq scan), please include any indexes in your script**
 
@@ -73,7 +73,7 @@ JOIN example_1.products p
 	ON lp.product_id = p.id;
 ```
 
-## Question 2
+# Question 2
 
 **This needs to return quickly and should not scan the entire table (seq scan), please include any indexes in your script**
 
