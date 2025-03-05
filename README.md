@@ -53,7 +53,7 @@ CROSS JOIN
 ## Answer 1
 
 ```sql
-CREATE INDEX idx_product_prices_product_date
+CREATE INDEX idx_product_prices_published_date
 ON example_1.product_prices (product_id, published_date DESC);
 
 WITH latest_prices AS (
@@ -112,7 +112,7 @@ CROSS JOIN
 ## Answer 2
 
 ```sql
-CREATE INDEX idx_transactions_product_date
+CREATE INDEX idx_transactions_ship_date
 ON example_2.transactions (product_id, ship_date)
 INCLUDE (transaction_type, unit_of_measure);
 
@@ -220,4 +220,39 @@ CREATE TABLE example_4.transactions (
 INSERT INTO example_4.transactions (organization_id)
 SELECT ROUND((random() * 100 + 1)::numeric)
 FROM generate_series(1, 1000000, 1) AS id;
+```
+## Answer 4
+
+Create an Index on the organization_id column to optimize lookup times.
+```sql
+CREATE INDEX idx_transactions_organization_id ON example_4.transactions (organization_id);
+```
+If the data does not change frequently, I would use a materialized view to store the distinct organization_id values.
+```sql
+CREATE MATERIALIZED VIEW example_4.distinct_organization_ids AS
+SELECT DISTINCT organization_id
+FROM example_4.transactions;
+
+SELECT organization_id FROM example_4.distinct_organization_ids;
+```
+The materialized view can be refreshed periodically or as needed to reflect updates to the underlying table.
+```sql
+REFRESH MATERIALIZED VIEW distinct_product_ids;
+```
+
+If the table is updated frequently I would implement pagination by adding LIMIT and OFFSET to your queries.
+```sql
+CREATE INDEX idx_transactions_organization_id ON example_4.transactions (organization_id);
+
+SELECT DISTINCT organization_id
+FROM example_4.transactions
+ORDER BY organization_id
+LIMIT 10
+OFFSET 0;
+
+SELECT DISTINCT organization_id
+FROM example_4.transactions
+ORDER BY organization_id
+LIMIT 10
+OFFSET 10;
 ```
